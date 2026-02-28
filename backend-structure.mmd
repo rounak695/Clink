@@ -1,0 +1,23 @@
+graph TD
+    %% Phase 1
+    subgraph "Phase 1: Hackathon (Monolith)"
+        Client1[Client] --> ApiGateway1[Express Monolith]
+        ApiGateway1 --> DB1[(Supabase)]
+        ApiGateway1 --> Sockets1[Socket.io Local]
+    end
+
+    %% Phase 2
+    subgraph "Phase 2: Post-Hackathon (Microservices)"
+        Client2[Client] --> LB[Load Balancer / Gateway]
+        LB --> FeedService[Feed API Service]
+        LB --> ChatService[Chat Server 1..N]
+        LB --> NotifService[Notification Worker]
+        
+        FeedService --> DB2[(Supabase PostgreSQL)]
+        FeedService --> RedisCache[(Redis Cache)]
+        
+        ChatService --> RedisPubSub((Redis Pub/Sub))
+        ChatService --> DB2
+        
+        NotifService --> RedisPubSub
+    end

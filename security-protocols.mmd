@@ -1,0 +1,27 @@
+flowchart TD
+    %% Security Layers
+    UserA([Student Request])
+    
+    subgraph "Layer 1: Edge Security"
+        WAF[WAF / Cloudflare]
+        RateLimiter[Rate Limiter - 100 req/min]
+        WAF --> RateLimiter
+    end
+
+    subgraph "Layer 2: Application Auth"
+        Gateway[API Gateway / Express CORS]
+        JWTAuth[Supabase OAuth / JWT Validation]
+        Gateway --> JWTAuth
+    end
+    
+    subgraph "Layer 3: Database Security"
+        RLS{Row Level Security 'RLS'}
+        StudentData[(Student Data)]
+        RLS -->|Only view same university| StudentData
+        RLS -->|Only author can edit| StudentData
+    end
+
+    UserA --> WAF
+    RateLimiter --> Gateway
+    JWTAuth -->|Valid Token| RLS
+    JWTAuth -->|Invalid| Reject([401 Unauthorized])
